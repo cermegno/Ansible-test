@@ -141,7 +141,6 @@ ansible all -m service -a  "name=redis state=started"
 # - ensure the /etc/redis.conf file has the "bind 127.0.0.1" line commented out
 # - ensure the redis service is started
 
-
 # SSH to the database server and check that Redis is working
 ssh root@192.168.56.21
 redis-cli

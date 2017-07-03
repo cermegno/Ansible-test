@@ -1,0 +1,12 @@
+---
+- hosts: all
+  tasks:
+  - name: Ensure dos2unix package is installed
+    yum: 
+      name: dos2unix
+      state: absent
+
+  - name: Copy ansible inventory file to client
+    copy: src=/vagrant/test.txt dest=/root/copied.txt
+            owner=root group=root mode=0644
+

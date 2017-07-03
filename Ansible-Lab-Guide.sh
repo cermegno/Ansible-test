@@ -1,0 +1,147 @@
+# Clone repo https://github.com/cermegno/Ansible-test
+# Make a directory ansible-test
+# Copy Vagrantfile into it
+# Copy the Centos65.box into it
+# Open a DOS prompt an "cd" into the directory
+# Start the Vagrant deployment
+vagrant up
+# Note the ssh port of the 'mgmt' server
+# When Vagrant finishes Putty to 'mgmt' server (127.0.0.1:2222)
+# Log in:  root / vagrant
+
+# Vagrant has created a folder sync similar to this
+# /vagrant => C:/Users/{your_username}/{folder_containing_Vagrantfile}
+ls /vagrant
+
+# In your Windows host copy the files you cloned from the repo into that folder
+# Verify the files are there
+ls /vagrant
+cd /vagrant
+
+# Verify you can ping the two hosts we are going to manage
+ping 192.168.56.20
+ping 192.168.56.21
+
+# Verify you can ssh to them, ex:
+ssh root@192.168.56.20
+ssh root@192.168.56.21
+
+# Install "Ansible"
+yum -y install ansible
+
+# If you are not familiar with "vi" install "nano"
+yum -y install nano
+
+# edit /etc/ansible/hosts as follows
+
+[webserver]
+192.168.56.20
+[database]
+192.168.56.21
+
+# Use Ansible to verify connectivity
+ansible all -m ping
+# Let's instruct Ansible to ask for passwords instead of certificates
+ansible all -m ping -k
+# We are using the same user for all hosts, so it asks for the password only once 
+# You can be more selective and apply actions to specific category of servers
+ansible webserver -m ping -k
+ansible database -m ping -k
+# Ansible playbooks are a way of automating many tasks as opposed to running ad-hoc commands
+# Examine "ping.yml"
+# Now you can run it
+ansible-playbook ping.yml -k
+
+# If we implement certificates we won't have to type passwords
+# Can we use Ansible for this? You bet !!
+
+# We need to generate keys and place the public key in the managed hosts
+# Generate your key (default file name, no passphrase)
+ssh-keygen -t rsa
+# View the key you just created
+cat ~/.ssh/id_rsa.pub
+# Visualize the add-key.yml to see what it does
+cat add-key.yml
+# Run it. It will prompt you for the password
+ansible-playbook add-key.yml -k
+# Now you are able to run things without -k option
+ansible all -m ping
+
+# The command shows that the public key of the manamgent host is now authorized
+ansible all -m shell -a 'cat /root/.ssh/authorized_keys'
+
+# Verify with an ad-hoc whether yum specific packages are installed
+ansible all -m shell -a 'yum list installed bash'
+ansible all -m shell -a 'yum list installed dos2unix'
+# There is a warning about using the "yum" module. We will use it soon
+
+# Verify that the test.txt file is not present in root user's directory
+ansible all -m shell -a 'ls -la'
+
+# Let's view the "file-and-package.yml" playbook
+cat file-and-package.yml
+
+# Now run the file-and-package.yml playbook
+ansible-playbook file-and-package.yml
+
+# Let's see the results
+ansible all -m shell -a 'ls -la'
+ansible all -m shell -a 'yum list installed dos2unix'
+# Is the file there?
+# Is the package installed?
+
+# Pay attention to the output you got from running the playbook
+# Do the colours make sense?
+
+# Edit file-and-package.yml
+Replace "absent" with "present"
+# Do the colours and messages make sense now?
+# Run it again
+# What about now?
+ansible all -m shell -a 'yum list installed dos2unix'
+
+# Can you find out what version of Python is running on all boxes? TIP: python -V
+# Can you find out whether "pip" is installed? TIP: python-pip
+
+##############
+# EXERCISE 1 #
+##############
+# Write your own playbook file to do this on the webserver host:
+# - install pip with the yum module (python-pip)
+# - install flask with the pip module
+# - copy the web.py from the https://github.com/cermegno/Ansible-test repo, but name it "app.py". Dont use the local copy you cloned
+# - run the script so that the web server starts
+# TIP1: look for the 'pip' module
+# TIP2: look for the 'get_url' module
+# TIP3: format to retrieve github files is https://raw.githubusercontent.com/{user}/{repo}/{branch}/{filename}
+# TIP4: This is the task to run the app.py
+
+  - name: Start the script
+    shell: cd /root ;  nohup python app.py </dev/null >/dev/null 2>&1 &
+
+# You can test it from the mgmt server with cURL:
+curl http://192.168.56.20:5000
+
+# In order to test it from a graphical browser you need to forward the port
+# In VirtualBox go to Host1 > Settings > Network > Adapter 1 > Port Forwarding and set a rule:
+# Web, TCP, 127.0.0.1, 5000, 192.168.56.20, 5000
+# Now you should see it from your laptop browser
+http://127.0.0.1:5000
+
+# Let's use the "service" module to check if the following services are started: crond, redis
+ansible all -m service -a  "name=crond state=started"
+ansible all -m service -a  "name=redis state=started"
+
+##############
+# EXERCISE 2 #
+##############
+# Write your own playbook file to do the following:
+# On the 'database' server only
+# - install Redis on the database host
+# - ensure the /etc/redis.conf file has the "bind 127.0.0.1" line commented out
+# - ensure the redis service is started
+
+
+# SSH to the database server and check that Redis is working
+ssh root@192.168.56.21
+redis-cli

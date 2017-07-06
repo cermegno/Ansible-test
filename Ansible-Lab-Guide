@@ -100,6 +100,12 @@ Replace "absent" with "present"
 # What about now?
 ansible all -m shell -a 'yum list installed dos2unix'
 
+# Ansible also has a dry-run mode. For ad-hoc commands use --check
+# For tasks inside playbooks use: check_mode: yes
+ansible all -m yum -a 'name=dos2unix state=absent' --check
+# Verify that it wasn't uninstalled
+ansible all -m shell -a 'yum list installed dos2unix'
+
 # Can you find out what version of Python is running on all boxes? TIP: python -V
 # Can you find out whether "pip" is installed? TIP: python-pip
 

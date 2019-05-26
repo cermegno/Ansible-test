@@ -14,7 +14,7 @@ Vagrant.configure("2") do |config|
   # boxes at https://atlas.hashicorp.com/search.
   config.vm.define "mgmt" do |mgmt|
     mgmt.vm.box = "mgmt"
-    mgmt.vm.box_url = "file://centos65.box"
+    mgmt.vm.box_url = "file://centos65-ansible.box"
 	mgmt.vm.hostname = "mgmt"
 	#mgmt.vm.network "forwarded_port", guest: 6379, host: 6379, host_ip: "127.0.0.1", auto_correct: true
     mgmt.vm.network "private_network", ip: "192.168.56.10"
@@ -28,7 +28,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "host1" do |host1|
     host1.vm.box = "host1"
-    host1.vm.box_url = "file://centos65.box"
+    host1.vm.box_url = "file://centos65-ansible.box"
 	host1.vm.hostname = "host1"
     host1.vm.network "private_network", ip: "192.168.56.20"
 
@@ -36,7 +36,7 @@ Vagrant.configure("2") do |config|
 
     config.vm.define "host2" do |host2|
     host2.vm.box = "host2"
-    host2.vm.box_url = "file://centos65.box"
+    host2.vm.box_url = "file://centos65-ansible.box"
 	host2.vm.hostname = "host2"
     host2.vm.network "private_network", ip: "192.168.56.21"
 

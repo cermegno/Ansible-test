@@ -26,10 +26,11 @@ ping 192.168.56.21
 ssh root@192.168.56.20
 ssh root@192.168.56.21
 
-# Install "Ansible"
-yum -y install ansible
+# Normally you would install "Ansible" in the Management server as follows:
+#yum -y install ansible
+# But the image that has been provided has it preinstalled
 
-# If you are not familiar with "vi" install "nano"
+# If you are not familiar with "vi" text editor install "nano"
 yum -y install nano
 
 # edit /etc/ansible/hosts as follows

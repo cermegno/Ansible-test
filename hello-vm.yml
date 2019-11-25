@@ -3,4 +3,4 @@
   tasks:
     - name: Hello Message
       debug:
-        msg: "Hi {{ vm_name }}, the secrets are {{ user }} - {{ password }}"
+        msg: "Hi {{ vm_name }}"

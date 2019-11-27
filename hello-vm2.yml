@@ -1,6 +1,32 @@
-- name: Hello World Sample
+- name: Sample VM creation
   hosts: all
+
+  vars:
+    vcenter_hostname: "{{ lookup('env','VMWARE_HOST') }}"
+    vcenter_username: "{{ lookup('env','VMWARE_USER') }}"
+    vcenter_password: "{{ lookup('env','VMWARE_PASSWORD') }}"
+
   tasks:
     - name: Hello Message
       debug:
         msg: "Hi {{ vm_name }}"
+        
+    - name: Clone Template
+      vmware_guest:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        name: "{{ vm_name }}"
+        template: "{{ template }}"
+        datacenter: "{{ datacenter_name }}"
+        folder: "{{ folder }}"
+        cluster: "{{ cluster_name }}"
+        datastore: "{{virtual_machine_datastore}}"
+        validate_certs: False
+        state: poweredon
+        force: yes
+        wait_for_ip_address: yes
+      register: facts
+
+    - debug:
+        msg: "Adding an entry in inventory for {{ vm_name }} = {{ facts.instance.ipv4 }}"

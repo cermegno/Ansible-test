@@ -3,4 +3,4 @@
   tasks:
     - name: Hello Message
       debug:
-        msg: "Hi {{ vm_name }}"
+        msg: "Hi {{ vm_name }}, welcome to Jenkins"
